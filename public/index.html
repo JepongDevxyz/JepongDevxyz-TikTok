@@ -11,7 +11,7 @@
 
     <!-- Header -->
     <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <div class="bg-gradient-to-tr from-cyan-500 to-pink-500 p-2 rounded-xl text-white">
                     <i class="fa-brands fa-tiktok text-xl"></i>
@@ -20,12 +20,12 @@
                     TikXedd Studio
                 </h1>
             </div>
-            <span class="text-xs font-mono bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">v1.2.0</span>
+            <span class="text-xs font-mono bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">v2.1.0</span>
         </div>
     </header>
 
     <!-- Main Container -->
-    <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full space-y-8">
+    <main class="max-w-5xl mx-auto px-4 py-8 flex-1 w-full space-y-8">
         
         <!-- Navigation Tabs -->
         <div class="flex border-b border-slate-800 gap-4">
@@ -42,7 +42,7 @@
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
                 <label class="block text-sm font-medium text-slate-300 mb-2">TikTok Video or Photo Link</label>
                 <div class="flex flex-col sm:flex-row gap-3">
-                    <input type="text" id="resolve-url" placeholder="https://www.tiktok.com/@user/video/1234567890" 
+                    <input type="text" id="resolve-url" placeholder="https://vt.tiktok.com/xxxxxx/" 
                         class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition">
                     <button onclick="handleResolve()" id="resolve-btn" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 font-semibold px-6 py-3 rounded-xl text-sm transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-magnifying-glass"></i> Resolve
@@ -53,43 +53,53 @@
             <!-- Resolve Results Card -->
             <div id="resolve-result" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
                 <div class="flex flex-col md:flex-row gap-6 items-start">
-                    <div class="w-full md:w-1/3 aspect-[9/16] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center relative">
+                    
+                    <!-- Media Preview -->
+                    <div class="w-full md:w-5/12 aspect-[9/16] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center relative">
                         <video id="res-video" controls class="w-full h-full object-cover hidden"></video>
+                        <img id="res-image" class="w-full h-full object-cover hidden" alt="Preview">
                         <div id="res-media-placeholder" class="text-slate-600 text-center p-4">
-                            <i class="fa-solid fa-photo-film text-4xl mb-2"></i>
+                            <i class="fa-solid fa-photo-film text-4xl mb-2 block"></i>
                             <p class="text-xs">Preview unavailable</p>
                         </div>
                     </div>
 
+                    <!-- Details & Download Buttons -->
                     <div class="flex-1 space-y-4 w-full">
-                        <div>
-                            <span id="res-author" class="text-xs font-semibold text-cyan-400 bg-cyan-950/50 border border-cyan-800/50 px-2.5 py-1 rounded-md"></span>
-                            <p id="res-desc" class="text-slate-200 mt-2 text-sm leading-relaxed"></p>
+                        <div class="flex items-center gap-3">
+                            <img id="res-avatar" class="w-10 h-10 rounded-full border border-slate-700 hidden" alt="Avatar">
+                            <div>
+                                <span id="res-author" class="text-xs font-semibold text-cyan-400 bg-cyan-950/50 border border-cyan-800/50 px-2.5 py-1 rounded-md"></span>
+                                <span id="res-handle" class="text-xs text-slate-400 block mt-1"></span>
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800/60 text-center text-xs">
+                        <p id="res-desc" class="text-slate-200 text-sm leading-relaxed"></p>
+
+                        <!-- Stats Row -->
+                        <div class="grid grid-cols-3 gap-2 bg-slate-950 p-3 rounded-xl border border-slate-800/80 text-center text-xs">
                             <div>
-                                <span class="text-slate-500 block">Duration</span>
-                                <span id="res-duration" class="font-medium text-slate-300">-</span>
+                                <span class="text-slate-500 block">Plays</span>
+                                <span id="res-plays" class="font-semibold text-slate-300">-</span>
                             </div>
                             <div>
-                                <span class="text-slate-500 block">Width</span>
-                                <span id="res-width" class="font-medium text-slate-300">-</span>
+                                <span class="text-slate-500 block">Likes</span>
+                                <span id="res-likes" class="font-semibold text-slate-300">-</span>
                             </div>
                             <div>
-                                <span class="text-slate-500 block">Height</span>
-                                <span id="res-height" class="font-medium text-slate-300">-</span>
+                                <span class="text-slate-500 block">Shares</span>
+                                <span id="res-shares" class="font-semibold text-slate-300">-</span>
                             </div>
                         </div>
 
                         <div class="space-y-2 pt-2">
-                            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Download Links</h4>
+                            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Download Options</h4>
                             <div class="flex flex-wrap gap-2" id="res-downloads"></div>
                         </div>
 
                         <div class="pt-4 border-t border-slate-800">
-                            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Raw JSON Response</h4>
-                            <pre id="raw-json" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] font-mono text-cyan-300 overflow-x-auto max-h-48"></pre>
+                            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Raw Data Output</h4>
+                            <pre id="raw-json" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] font-mono text-cyan-300 overflow-x-auto max-h-40"></pre>
                         </div>
                     </div>
                 </div>
@@ -109,7 +119,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Query Keyword</label>
-                        <input type="text" id="feed-query" placeholder="e.g. cats, dance" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500">
+                        <input type="text" id="feed-query" placeholder="e.g. viral, dance" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Cursor</label>
@@ -153,19 +163,6 @@
             }
         }
 
-        // Recursive URL extractor fallback
-        function findAllUrls(obj, list = []) {
-            if (!obj) return list;
-            if (typeof obj === 'string' && (obj.startsWith('http://') || obj.startsWith('https://'))) {
-                list.push(obj);
-            } else if (typeof obj === 'object') {
-                for (let k in obj) {
-                    findAllUrls(obj[k], list);
-                }
-            }
-            return list;
-        }
-
         async function handleResolve() {
             const urlInput = document.getElementById('resolve-url').value.trim();
             if (!urlInput) return alert('Please enter a valid TikTok URL');
@@ -176,75 +173,85 @@
 
             try {
                 const res = await fetch(`/api/resolve?url=${encodeURIComponent(urlInput)}`);
-                const data = await res.json();
+                const responseData = await res.json();
 
-                if (!res.ok) throw new Error(data.error || 'Failed to resolve link');
+                if (!res.ok || responseData.ok === false) {
+                    throw new Error(responseData.error || 'Failed to parse media link.');
+                }
 
                 document.getElementById('resolve-result').classList.remove('hidden');
-                document.getElementById('raw-json').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('raw-json').textContent = JSON.stringify(responseData, null, 2);
 
-                // Author mapping
-                const author = data.author?.nickname || data.author?.unique_id || data.author || data.nickname || 'user';
-                document.getElementById('res-author').textContent = `@${author}`;
+                const item = responseData.item || responseData.result || responseData;
 
-                // Description mapping
-                const desc = data.description || data.title || data.desc || 'No description available.';
-                document.getElementById('res-desc').textContent = desc;
+                // Author Details
+                const authorName = item.author?.name || 'TikTok User';
+                const authorHandle = item.author?.handle ? `@${item.author.handle}` : '';
+                document.getElementById('res-author').textContent = authorName;
+                document.getElementById('res-handle').textContent = authorHandle;
 
-                // Meta Specs mapping
-                const meta = data.meta || data.music_info || {};
-                document.getElementById('res-duration').textContent = data.duration ? `${data.duration}s` : (meta.duration ? `${meta.duration}s` : 'N/A');
-                document.getElementById('res-width').textContent = data.width || meta.width || 'N/A';
-                document.getElementById('res-height').textContent = data.height || meta.height || 'N/A';
-
-                // Video Download & Preview links detection
-                const noWatermark = data.download?.noWatermark || data.play || data.hdplay || data.video || data.url;
-                const watermark = data.download?.watermark || data.wmplay;
-
-                const mediaVideo = document.getElementById('res-video');
-                const mediaPlaceholder = document.getElementById('res-media-placeholder');
-
-                if (noWatermark) {
-                    mediaVideo.src = noWatermark;
-                    mediaVideo.classList.remove('hidden');
-                    mediaPlaceholder.classList.add('hidden');
-                } else {
-                    mediaVideo.classList.add('hidden');
-                    mediaPlaceholder.classList.remove('hidden');
+                if (item.author?.avatar) {
+                    const avatarImg = document.getElementById('res-avatar');
+                    avatarImg.src = item.author.avatar;
+                    avatarImg.classList.remove('hidden');
                 }
 
-                // Populate Download Buttons
+                // Description
+                document.getElementById('res-desc').textContent = item.title || item.desc || 'No caption available.';
+
+                // Stats
+                document.getElementById('res-plays').textContent = item.stats?.plays ? item.stats.plays.toLocaleString() : '-';
+                document.getElementById('res-likes').textContent = item.stats?.likes ? item.stats.likes.toLocaleString() : '-';
+                document.getElementById('res-shares').textContent = item.stats?.shares ? item.stats.shares.toLocaleString() : '-';
+
+                // Media Preview & Downloads
+                const videoEl = document.getElementById('res-video');
+                const imageEl = document.getElementById('res-image');
+                const placeholderEl = document.getElementById('res-media-placeholder');
                 const dlContainer = document.getElementById('res-downloads');
+
                 dlContainer.innerHTML = '';
+                videoEl.classList.add('hidden');
+                imageEl.classList.add('hidden');
+                placeholderEl.classList.remove('hidden');
+
+                // Extract Video Links
+                const noWatermark = item.video?.noWatermark || item.video?.play;
+                const hdVideo = item.video?.hd;
+                const watermark = item.video?.watermark;
 
                 if (noWatermark) {
+                    videoEl.src = noWatermark;
+                    videoEl.classList.remove('hidden');
+                    placeholderEl.classList.add('hidden');
+
                     dlContainer.innerHTML += `<a href="${noWatermark}" target="_blank" download class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2"><i class="fa-solid fa-download"></i> No Watermark</a>`;
                 }
+
+                if (hdVideo) {
+                    dlContainer.innerHTML += `<a href="${hdVideo}" target="_blank" download class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2"><i class="fa-solid fa-film"></i> HD Quality</a>`;
+                }
+
                 if (watermark) {
                     dlContainer.innerHTML += `<a href="${watermark}" target="_blank" download class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2"><i class="fa-solid fa-watermark"></i> With Watermark</a>`;
                 }
 
-                // If images/slides exist
-                const images = data.images || data.photos || [];
+                // Images / Slide Posts
+                const images = item.images || [];
                 if (Array.isArray(images) && images.length > 0) {
+                    imageEl.src = images[0];
+                    imageEl.classList.remove('hidden');
+                    videoEl.classList.add('hidden');
+                    placeholderEl.classList.add('hidden');
+
                     images.forEach((imgUrl, i) => {
-                        const src = typeof imgUrl === 'string' ? imgUrl : (imgUrl.url || imgUrl.display_url);
-                        if (src) {
-                            dlContainer.innerHTML += `<a href="${src}" target="_blank" download class="bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1"><i class="fa-solid fa-image"></i> Photo ${i + 1}</a>`;
-                        }
+                        dlContainer.innerHTML += `<a href="${imgUrl}" target="_blank" download class="bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1"><i class="fa-solid fa-image"></i> Photo ${i + 1}</a>`;
                     });
                 }
 
-                // Deep Fallback if no specific keys matched
-                if (!noWatermark && !watermark && images.length === 0) {
-                    const fallbackUrls = [...new Set(findAllUrls(data))];
-                    if (fallbackUrls.length > 0) {
-                        fallbackUrls.slice(0, 4).forEach((link, idx) => {
-                            dlContainer.innerHTML += `<a href="${link}" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium px-3 py-2 rounded-xl flex items-center gap-2 border border-slate-700"><i class="fa-solid fa-link"></i> Media Link ${idx + 1}</a>`;
-                        });
-                    } else {
-                        dlContainer.innerHTML = `<span class="text-xs text-rose-400">No media links extracted from upstream API.</span>`;
-                    }
+                // Music Track
+                if (item.music?.url) {
+                    dlContainer.innerHTML += `<a href="${item.music.url}" target="_blank" download class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1"><i class="fa-solid fa-music"></i> Audio Track</a>`;
                 }
 
             } catch (err) {
@@ -274,17 +281,17 @@
                 const grid = document.getElementById('feed-grid');
                 grid.innerHTML = '';
 
-                const items = data.items || data.data || data.itemList || [];
+                const items = data.items || data.result || data.data || [];
 
                 if (!Array.isArray(items) || items.length === 0) {
                     grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-8">No feed items found.</p>`;
                     return;
                 }
 
-                items.forEach(item => {
-                    const author = item.author?.nickname || item.author?.unique_id || item.author || 'user';
-                    const desc = item.description || item.title || item.desc || 'No description';
-                    const itemLink = item.download?.noWatermark || item.play || item.hdplay || item.link;
+                items.forEach(feedItem => {
+                    const author = feedItem.author?.name || feedItem.author || 'User';
+                    const desc = feedItem.title || feedItem.desc || 'No description';
+                    const mediaLink = feedItem.video?.noWatermark || feedItem.play || feedItem.url;
 
                     grid.innerHTML += `
                         <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3">
@@ -292,8 +299,8 @@
                                 <span class="text-xs font-semibold text-pink-400">@${author}</span>
                                 <p class="text-xs text-slate-300 mt-1 line-clamp-3">${desc}</p>
                             </div>
-                            ${itemLink ? `
-                                <a href="${itemLink}" target="_blank" class="text-center bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium py-2 rounded-lg border border-slate-700 flex items-center justify-center gap-1">
+                            ${mediaLink ? `
+                                <a href="${mediaLink}" target="_blank" class="text-center bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium py-2 rounded-lg border border-slate-700 flex items-center justify-center gap-1">
                                     <i class="fa-solid fa-download"></i> Open Media
                                 </a>
                             ` : ''}
