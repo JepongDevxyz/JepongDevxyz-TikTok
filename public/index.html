@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikXedd API Studio - JepongDevxyz</title>
+    <title>TikXedd Studio - JepongDevxyz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -20,7 +20,7 @@
                     TikXedd Studio
                 </h1>
             </div>
-            <span class="text-xs font-mono bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">v1.0.0</span>
+            <span class="text-xs font-mono bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">v1.2.0</span>
         </div>
     </header>
 
@@ -84,7 +84,12 @@
 
                         <div class="space-y-2 pt-2">
                             <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Download Links</h4>
-                            <div class="flex flex-wrap gap-3" id="res-downloads"></div>
+                            <div class="flex flex-wrap gap-2" id="res-downloads"></div>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-800">
+                            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Raw JSON Response</h4>
+                            <pre id="raw-json" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] font-mono text-cyan-300 overflow-x-auto max-h-48"></pre>
                         </div>
                     </div>
                 </div>
@@ -148,6 +153,19 @@
             }
         }
 
+        // Recursive URL extractor fallback
+        function findAllUrls(obj, list = []) {
+            if (!obj) return list;
+            if (typeof obj === 'string' && (obj.startsWith('http://') || obj.startsWith('https://'))) {
+                list.push(obj);
+            } else if (typeof obj === 'object') {
+                for (let k in obj) {
+                    findAllUrls(obj[k], list);
+                }
+            }
+            return list;
+        }
+
         async function handleResolve() {
             const urlInput = document.getElementById('resolve-url').value.trim();
             if (!urlInput) return alert('Please enter a valid TikTok URL');
@@ -163,17 +181,31 @@
                 if (!res.ok) throw new Error(data.error || 'Failed to resolve link');
 
                 document.getElementById('resolve-result').classList.remove('hidden');
-                document.getElementById('res-author').textContent = `@${data.author || 'unknown'}`;
-                document.getElementById('res-desc').textContent = data.description || 'No description available.';
-                document.getElementById('res-duration').textContent = data.meta?.duration ? `${data.meta.duration}s` : 'N/A';
-                document.getElementById('res-width').textContent = data.meta?.width || 'N/A';
-                document.getElementById('res-height').textContent = data.meta?.height || 'N/A';
+                document.getElementById('raw-json').textContent = JSON.stringify(data, null, 2);
+
+                // Author mapping
+                const author = data.author?.nickname || data.author?.unique_id || data.author || data.nickname || 'user';
+                document.getElementById('res-author').textContent = `@${author}`;
+
+                // Description mapping
+                const desc = data.description || data.title || data.desc || 'No description available.';
+                document.getElementById('res-desc').textContent = desc;
+
+                // Meta Specs mapping
+                const meta = data.meta || data.music_info || {};
+                document.getElementById('res-duration').textContent = data.duration ? `${data.duration}s` : (meta.duration ? `${meta.duration}s` : 'N/A');
+                document.getElementById('res-width').textContent = data.width || meta.width || 'N/A';
+                document.getElementById('res-height').textContent = data.height || meta.height || 'N/A';
+
+                // Video Download & Preview links detection
+                const noWatermark = data.download?.noWatermark || data.play || data.hdplay || data.video || data.url;
+                const watermark = data.download?.watermark || data.wmplay;
 
                 const mediaVideo = document.getElementById('res-video');
                 const mediaPlaceholder = document.getElementById('res-media-placeholder');
-                
-                if (data.download?.noWatermark) {
-                    mediaVideo.src = data.download.noWatermark;
+
+                if (noWatermark) {
+                    mediaVideo.src = noWatermark;
                     mediaVideo.classList.remove('hidden');
                     mediaPlaceholder.classList.add('hidden');
                 } else {
@@ -181,14 +213,38 @@
                     mediaPlaceholder.classList.remove('hidden');
                 }
 
+                // Populate Download Buttons
                 const dlContainer = document.getElementById('res-downloads');
                 dlContainer.innerHTML = '';
-                
-                if (data.download?.noWatermark) {
-                    dlContainer.innerHTML += `<a href="${data.download.noWatermark}" target="_blank" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2"><i class="fa-solid fa-download"></i> No Watermark</a>`;
+
+                if (noWatermark) {
+                    dlContainer.innerHTML += `<a href="${noWatermark}" target="_blank" download class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2"><i class="fa-solid fa-download"></i> No Watermark</a>`;
                 }
-                if (data.download?.watermark) {
-                    dlContainer.innerHTML += `<a href="${data.download.watermark}" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2"><i class="fa-solid fa-watermark"></i> With Watermark</a>`;
+                if (watermark) {
+                    dlContainer.innerHTML += `<a href="${watermark}" target="_blank" download class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2"><i class="fa-solid fa-watermark"></i> With Watermark</a>`;
+                }
+
+                // If images/slides exist
+                const images = data.images || data.photos || [];
+                if (Array.isArray(images) && images.length > 0) {
+                    images.forEach((imgUrl, i) => {
+                        const src = typeof imgUrl === 'string' ? imgUrl : (imgUrl.url || imgUrl.display_url);
+                        if (src) {
+                            dlContainer.innerHTML += `<a href="${src}" target="_blank" download class="bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1"><i class="fa-solid fa-image"></i> Photo ${i + 1}</a>`;
+                        }
+                    });
+                }
+
+                // Deep Fallback if no specific keys matched
+                if (!noWatermark && !watermark && images.length === 0) {
+                    const fallbackUrls = [...new Set(findAllUrls(data))];
+                    if (fallbackUrls.length > 0) {
+                        fallbackUrls.slice(0, 4).forEach((link, idx) => {
+                            dlContainer.innerHTML += `<a href="${link}" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium px-3 py-2 rounded-xl flex items-center gap-2 border border-slate-700"><i class="fa-solid fa-link"></i> Media Link ${idx + 1}</a>`;
+                        });
+                    } else {
+                        dlContainer.innerHTML = `<span class="text-xs text-rose-400">No media links extracted from upstream API.</span>`;
+                    }
                 }
 
             } catch (err) {
@@ -218,21 +274,27 @@
                 const grid = document.getElementById('feed-grid');
                 grid.innerHTML = '';
 
-                if (!data.items || data.items.length === 0) {
+                const items = data.items || data.data || data.itemList || [];
+
+                if (!Array.isArray(items) || items.length === 0) {
                     grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-8">No feed items found.</p>`;
                     return;
                 }
 
-                data.items.forEach(item => {
+                items.forEach(item => {
+                    const author = item.author?.nickname || item.author?.unique_id || item.author || 'user';
+                    const desc = item.description || item.title || item.desc || 'No description';
+                    const itemLink = item.download?.noWatermark || item.play || item.hdplay || item.link;
+
                     grid.innerHTML += `
                         <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3">
                             <div>
-                                <span class="text-xs font-semibold text-pink-400">@${item.author || 'user'}</span>
-                                <p class="text-xs text-slate-300 mt-1 line-clamp-3">${item.description || 'No description'}</p>
+                                <span class="text-xs font-semibold text-pink-400">@${author}</span>
+                                <p class="text-xs text-slate-300 mt-1 line-clamp-3">${desc}</p>
                             </div>
-                            ${item.download?.noWatermark ? `
-                                <a href="${item.download.noWatermark}" target="_blank" class="text-center bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium py-2 rounded-lg border border-slate-700 flex items-center justify-center gap-1">
-                                    <i class="fa-solid fa-download"></i> Download Media
+                            ${itemLink ? `
+                                <a href="${itemLink}" target="_blank" class="text-center bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium py-2 rounded-lg border border-slate-700 flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-download"></i> Open Media
                                 </a>
                             ` : ''}
                         </div>
