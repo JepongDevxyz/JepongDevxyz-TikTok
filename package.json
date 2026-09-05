@@ -1,0 +1,14 @@
+{
+  "name": "tikxedd-api-clone",
+  "version": "1.0.0",
+  "description": "Clean TikTok API Proxy",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.22.2",
+    "node-fetch": "^3.3.2"
+  }
+}
