@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikXedd API Studio - JepongDevxyz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-cyan-500 to-pink-500 p-2 rounded-xl text-white">
+                    <i class="fa-brands fa-tiktok text-xl"></i>
+                </div>
+                <h1 class="font-bold text-xl tracking-wide bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">
+                    TikXedd Studio
+                </h1>
+            </div>
+            <span class="text-xs font-mono bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">v1.0.0</span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full space-y-8">
+        
+        <!-- Navigation Tabs -->
+        <div class="flex border-b border-slate-800 gap-4">
+            <button id="tab-resolve-btn" onclick="switchTab('resolve')" class="pb-3 px-2 text-cyan-400 border-b-2 border-cyan-400 font-medium text-sm flex items-center gap-2">
+                <i class="fa-solid fa-link"></i> URL Resolver
+            </button>
+            <button id="tab-feed-btn" onclick="switchTab('feed')" class="pb-3 px-2 text-slate-400 border-b-2 border-transparent font-medium text-sm flex items-center gap-2 hover:text-slate-200">
+                <i class="fa-solid fa-compass"></i> Feed & Search
+            </button>
+        </div>
+
+        <!-- Section 1: URL Resolver -->
+        <section id="section-resolve" class="space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <label class="block text-sm font-medium text-slate-300 mb-2">TikTok Video or Photo Link</label>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="resolve-url" placeholder="https://www.tiktok.com/@user/video/1234567890" 
+                        class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition">
+                    <button onclick="handleResolve()" id="resolve-btn" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 font-semibold px-6 py-3 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass"></i> Resolve
+                    </button>
+                </div>
+            </div>
+
+            <!-- Resolve Results Card -->
+            <div id="resolve-result" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+                <div class="flex flex-col md:flex-row gap-6 items-start">
+                    <div class="w-full md:w-1/3 aspect-[9/16] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center relative">
+                        <video id="res-video" controls class="w-full h-full object-cover hidden"></video>
+                        <div id="res-media-placeholder" class="text-slate-600 text-center p-4">
+                            <i class="fa-solid fa-photo-film text-4xl mb-2"></i>
+                            <p class="text-xs">Preview unavailable</p>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 space-y-4 w-full">
+                        <div>
+                            <span id="res-author" class="text-xs font-semibold text-cyan-400 bg-cyan-950/50 border border-cyan-800/50 px-2.5 py-1 rounded-md"></span>
+                            <p id="res-desc" class="text-slate-200 mt-2 text-sm leading-relaxed"></p>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800/60 text-center text-xs">
+                            <div>
+                                <span class="text-slate-500 block">Duration</span>
+                                <span id="res-duration" class="font-medium text-slate-300">-</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block">Width</span>
+                                <span id="res-width" class="font-medium text-slate-300">-</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block">Height</span>
+                                <span id="res-height" class="font-medium text-slate-300">-</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2">
+                            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Download Links</h4>
+                            <div class="flex flex-wrap gap-3" id="res-downloads"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Feed & Search -->
+        <section id="section-feed" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Mode</label>
+                        <select id="feed-mode" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500">
+                            <option value="trending">Trending</option>
+                            <option value="search">Search</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Query Keyword</label>
+                        <input type="text" id="feed-query" placeholder="e.g. cats, dance" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Cursor</label>
+                        <input type="number" id="feed-cursor" value="0" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500">
+                    </div>
+                </div>
+                <button onclick="fetchFeedData()" id="feed-btn" class="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:opacity-90 font-semibold py-3 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrows-rotate"></i> Fetch Feed Data
+                </button>
+            </div>
+
+            <!-- Feed Grid -->
+            <div id="feed-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-900/30 py-4 text-center text-xs text-slate-500">
+        Engineered by <span class="text-slate-300 font-semibold">JepongDevxyz</span> &copy; 2026
+    </footer>
+
+    <!-- Frontend Script -->
+    <script>
+        function switchTab(tab) {
+            const resolveSec = document.getElementById('section-resolve');
+            const feedSec = document.getElementById('section-feed');
+            const resolveBtn = document.getElementById('tab-resolve-btn');
+            const feedBtn = document.getElementById('tab-feed-btn');
+
+            if (tab === 'resolve') {
+                resolveSec.classList.remove('hidden');
+                feedSec.classList.add('hidden');
+                resolveBtn.className = "pb-3 px-2 text-cyan-400 border-b-2 border-cyan-400 font-medium text-sm flex items-center gap-2";
+                feedBtn.className = "pb-3 px-2 text-slate-400 border-b-2 border-transparent font-medium text-sm flex items-center gap-2 hover:text-slate-200";
+            } else {
+                resolveSec.classList.add('hidden');
+                feedSec.classList.remove('hidden');
+                feedBtn.className = "pb-3 px-2 text-pink-400 border-b-2 border-pink-400 font-medium text-sm flex items-center gap-2";
+                resolveBtn.className = "pb-3 px-2 text-slate-400 border-b-2 border-transparent font-medium text-sm flex items-center gap-2 hover:text-slate-200";
+            }
+        }
+
+        async function handleResolve() {
+            const urlInput = document.getElementById('resolve-url').value.trim();
+            if (!urlInput) return alert('Please enter a valid TikTok URL');
+
+            const btn = document.getElementById('resolve-btn');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Resolving...`;
+
+            try {
+                const res = await fetch(`/api/resolve?url=${encodeURIComponent(urlInput)}`);
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.error || 'Failed to resolve link');
+
+                document.getElementById('resolve-result').classList.remove('hidden');
+                document.getElementById('res-author').textContent = `@${data.author || 'unknown'}`;
+                document.getElementById('res-desc').textContent = data.description || 'No description available.';
+                document.getElementById('res-duration').textContent = data.meta?.duration ? `${data.meta.duration}s` : 'N/A';
+                document.getElementById('res-width').textContent = data.meta?.width || 'N/A';
+                document.getElementById('res-height').textContent = data.meta?.height || 'N/A';
+
+                const mediaVideo = document.getElementById('res-video');
+                const mediaPlaceholder = document.getElementById('res-media-placeholder');
+                
+                if (data.download?.noWatermark) {
+                    mediaVideo.src = data.download.noWatermark;
+                    mediaVideo.classList.remove('hidden');
+                    mediaPlaceholder.classList.add('hidden');
+                } else {
+                    mediaVideo.classList.add('hidden');
+                    mediaPlaceholder.classList.remove('hidden');
+                }
+
+                const dlContainer = document.getElementById('res-downloads');
+                dlContainer.innerHTML = '';
+                
+                if (data.download?.noWatermark) {
+                    dlContainer.innerHTML += `<a href="${data.download.noWatermark}" target="_blank" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2"><i class="fa-solid fa-download"></i> No Watermark</a>`;
+                }
+                if (data.download?.watermark) {
+                    dlContainer.innerHTML += `<a href="${data.download.watermark}" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2"><i class="fa-solid fa-watermark"></i> With Watermark</a>`;
+                }
+
+            } catch (err) {
+                alert(`Error: ${err.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Resolve`;
+            }
+        }
+
+        async function fetchFeedData() {
+            const mode = document.getElementById('feed-mode').value;
+            const q = document.getElementById('feed-query').value.trim();
+            const cursor = document.getElementById('feed-cursor').value || 0;
+
+            const btn = document.getElementById('feed-btn');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Fetching...`;
+
+            try {
+                const params = new URLSearchParams({ mode, q, cursor });
+                const res = await fetch(`/api/feed?${params}`);
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.error || 'Failed to fetch feed');
+
+                const grid = document.getElementById('feed-grid');
+                grid.innerHTML = '';
+
+                if (!data.items || data.items.length === 0) {
+                    grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-8">No feed items found.</p>`;
+                    return;
+                }
+
+                data.items.forEach(item => {
+                    grid.innerHTML += `
+                        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3">
+                            <div>
+                                <span class="text-xs font-semibold text-pink-400">@${item.author || 'user'}</span>
+                                <p class="text-xs text-slate-300 mt-1 line-clamp-3">${item.description || 'No description'}</p>
+                            </div>
+                            ${item.download?.noWatermark ? `
+                                <a href="${item.download.noWatermark}" target="_blank" class="text-center bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium py-2 rounded-lg border border-slate-700 flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-download"></i> Download Media
+                                </a>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+
+            } catch (err) {
+                alert(`Error: ${err.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> Fetch Feed Data`;
+            }
+        }
+    </script>
+</body>
+</html>

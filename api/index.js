@@ -1,13 +1,14 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 const BASE_URL = 'https://tikxedd.vercel.app';
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../public')));
 
 // 1. Resolve TikTok URL Endpoint
 app.get('/api/resolve', async (req, res) => {
@@ -51,6 +52,9 @@ app.get('/api/feed', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+// Fallback to index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
 });
+
+module.exports = app;
