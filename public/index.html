@@ -9,6 +9,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
 
+    <!-- Header -->
     <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
         <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -19,12 +20,14 @@
                     TikXedd Studio
                 </h1>
             </div>
-            <span class="text-xs font-mono bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">v2.3.0 HD</span>
+            <span class="text-xs font-mono bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">v2.4.0 Studio</span>
         </div>
     </header>
 
+    <!-- Main Container -->
     <main class="max-w-5xl mx-auto px-4 py-8 flex-1 w-full space-y-8">
         
+        <!-- Navigation Tabs -->
         <div class="flex border-b border-slate-800 gap-4">
             <button id="tab-resolve-btn" onclick="switchTab('resolve')" class="pb-3 px-2 text-cyan-400 border-b-2 border-cyan-400 font-medium text-sm flex items-center gap-2">
                 <i class="fa-solid fa-link"></i> URL Resolver
@@ -34,6 +37,7 @@
             </button>
         </div>
 
+        <!-- Section 1: URL Resolver -->
         <section id="section-resolve" class="space-y-6">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
                 <label class="block text-sm font-medium text-slate-300 mb-2">TikTok Video or Photo Link</label>
@@ -46,9 +50,11 @@
                 </div>
             </div>
 
+            <!-- Resolve Results Card -->
             <div id="resolve-result" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
                 <div class="flex flex-col md:flex-row gap-6 items-start">
                     
+                    <!-- Media Preview -->
                     <div class="w-full md:w-5/12 aspect-[9/16] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center relative">
                         <video id="res-video" controls class="w-full h-full object-cover hidden"></video>
                         <img id="res-image" class="w-full h-full object-cover hidden" alt="Preview">
@@ -58,6 +64,7 @@
                         </div>
                     </div>
 
+                    <!-- Details & Download Buttons -->
                     <div class="flex-1 space-y-4 w-full">
                         <div class="flex items-center gap-3">
                             <img id="res-avatar" class="w-10 h-10 rounded-full border border-slate-700 hidden" alt="Avatar">
@@ -69,6 +76,7 @@
 
                         <p id="res-desc" class="text-slate-200 text-sm leading-relaxed"></p>
 
+                        <!-- Stats Row -->
                         <div class="grid grid-cols-3 gap-2 bg-slate-950 p-3 rounded-xl border border-slate-800/80 text-center text-xs">
                             <div>
                                 <span class="text-slate-500 block">Plays</span>
@@ -98,40 +106,79 @@
             </div>
         </section>
 
+        <!-- Section 2: Feed & Search -->
         <section id="section-feed" class="hidden space-y-6">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
+                    
+                    <!-- Modern Custom Floating Dropdown Menu -->
+                    <div class="relative">
                         <label class="block text-xs font-medium text-slate-400 mb-1">Mode</label>
-                        <select id="feed-mode" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500">
-                            <option value="trending">Trending</option>
-                            <option value="search">Search</option>
-                        </select>
+                        <button type="button" id="custom-dropdown-btn" onclick="toggleCustomDropdown()" 
+                            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm font-medium flex items-center justify-between text-left focus:outline-none focus:border-cyan-500 transition">
+                            <span id="selected-mode-text" class="flex items-center gap-2">
+                                <i class="fa-solid fa-fire text-pink-500"></i> Trending Feed
+                            </span>
+                            <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
+                        </button>
+
+                        <!-- Floating Options Card -->
+                        <div id="custom-dropdown-menu" class="hidden absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl z-50 overflow-hidden backdrop-blur-lg">
+                            <div onclick="selectMode('trending', 'Trending Feed', 'fa-solid fa-fire text-pink-500')" 
+                                class="px-4 py-3 text-sm hover:bg-slate-800 cursor-pointer flex items-center gap-3 border-b border-slate-800/50">
+                                <i class="fa-solid fa-fire text-pink-500"></i> Trending Feed
+                            </div>
+                            <div onclick="selectMode('music', 'Music Feed', 'fa-solid fa-music text-emerald-400')" 
+                                class="px-4 py-3 text-sm hover:bg-slate-800 cursor-pointer flex items-center gap-3 border-b border-slate-800/50">
+                                <i class="fa-solid fa-music text-emerald-400"></i> Music Feed
+                            </div>
+                            <div onclick="selectMode('search', 'Search Video', 'fa-solid fa-magnifying-glass text-cyan-400')" 
+                                class="px-4 py-3 text-sm hover:bg-slate-800 cursor-pointer flex items-center gap-3 border-b border-slate-800/50">
+                                <i class="fa-solid fa-magnifying-glass text-cyan-400"></i> Search Video
+                            </div>
+                            <div onclick="selectMode('photo', 'Search Photo', 'fa-solid fa-images text-yellow-400')" 
+                                class="px-4 py-3 text-sm hover:bg-slate-800 cursor-pointer flex items-center gap-3">
+                                <i class="fa-solid fa-images text-yellow-400"></i> Search Photo
+                            </div>
+                        </div>
                     </div>
-                    <div>
+
+                    <!-- Query Keyword Input -->
+                    <div id="query-container" class="opacity-50">
                         <label class="block text-xs font-medium text-slate-400 mb-1">Query Keyword</label>
-                        <input type="text" id="feed-query" placeholder="e.g. viral, dance" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500">
+                        <input type="text" id="feed-query" disabled placeholder="Only for Search modes" 
+                            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500 disabled:cursor-not-allowed">
                     </div>
+
+                    <!-- Cursor Input -->
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Cursor</label>
-                        <input type="number" id="feed-cursor" value="0" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500">
+                        <input type="number" id="feed-cursor" value="0" 
+                            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500">
                     </div>
                 </div>
-                <button onclick="fetchFeedData()" id="feed-btn" class="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:opacity-90 font-semibold py-3 rounded-xl text-sm transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-arrows-rotate"></i> Fetch Feed Data
+
+                <button onclick="fetchFeedData()" id="feed-btn" 
+                    class="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:opacity-90 font-semibold py-3 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrows-rotate"></i> Fetch Data
                 </button>
             </div>
 
+            <!-- Feed Grid -->
             <div id="feed-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </section>
 
     </main>
 
+    <!-- Footer -->
     <footer class="border-t border-slate-800 bg-slate-900/30 py-4 text-center text-xs text-slate-500">
         Engineered by <span class="text-slate-300 font-semibold">JepongDevxyz</span> &copy; 2026
     </footer>
 
+    <!-- Frontend Logic -->
     <script>
+        let currentMode = 'trending';
+
         function switchTab(tab) {
             const resolveSec = document.getElementById('section-resolve');
             const feedSec = document.getElementById('section-feed');
@@ -151,7 +198,45 @@
             }
         }
 
-        // Automatic HD Blob File Downloader
+        // Custom Floating Dropdown Functions
+        function toggleCustomDropdown() {
+            const menu = document.getElementById('custom-dropdown-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function selectMode(value, label, iconClass) {
+            currentMode = value;
+            document.getElementById('selected-mode-text').innerHTML = `<i class="${iconClass}"></i> ${label}`;
+            document.getElementById('custom-dropdown-menu').classList.add('hidden');
+
+            const queryInput = document.getElementById('feed-query');
+            const queryContainer = document.getElementById('query-container');
+
+            if (value === 'trending') {
+                queryInput.disabled = true;
+                queryInput.placeholder = "Only for Search modes";
+                queryContainer.classList.add('opacity-50');
+            } else if (value === 'music') {
+                queryInput.disabled = false;
+                queryInput.placeholder = "Enter sound link or music keyword";
+                queryContainer.classList.remove('opacity-50');
+            } else {
+                queryInput.disabled = false;
+                queryInput.placeholder = "e.g. viral, dance, mobile legends";
+                queryContainer.classList.remove('opacity-50');
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const btn = document.getElementById('custom-dropdown-btn');
+            const menu = document.getElementById('custom-dropdown-menu');
+            if (btn && menu && !btn.contains(event.target) && !menu.contains(event.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // Direct File Downloader
         async function triggerDirectDownload(url, filename, btnElement) {
             const originalHTML = btnElement.innerHTML;
             btnElement.disabled = true;
@@ -175,7 +260,6 @@
                 window.URL.revokeObjectURL(blobUrl);
                 document.body.removeChild(tempAnchor);
             } catch (err) {
-                // Direct fallback link
                 const tempAnchor = document.createElement('a');
                 tempAnchor.href = url;
                 tempAnchor.download = filename;
@@ -210,7 +294,6 @@
 
                 const item = responseData.item || responseData.result || responseData;
 
-                // Author Details
                 const authorName = item.author?.name || 'TikTok User';
                 const authorHandle = item.author?.handle ? `@${item.author.handle}` : '';
                 document.getElementById('res-author').textContent = authorName;
@@ -222,15 +305,12 @@
                     avatarImg.classList.remove('hidden');
                 }
 
-                // Description
                 document.getElementById('res-desc').textContent = item.title || item.desc || 'No caption available.';
 
-                // Stats
                 document.getElementById('res-plays').textContent = item.stats?.plays ? item.stats.plays.toLocaleString() : '-';
                 document.getElementById('res-likes').textContent = item.stats?.likes ? item.stats.likes.toLocaleString() : '-';
                 document.getElementById('res-shares').textContent = item.stats?.shares ? item.stats.shares.toLocaleString() : '-';
 
-                // Media Preview & Downloads
                 const videoEl = document.getElementById('res-video');
                 const imageEl = document.getElementById('res-image');
                 const placeholderEl = document.getElementById('res-media-placeholder');
@@ -241,12 +321,10 @@
                 imageEl.classList.add('hidden');
                 placeholderEl.classList.remove('hidden');
 
-                // High-Definition / Highest Quality Stream Links
                 const hdVideo = item.video?.hd;
                 const noWatermark = item.video?.noWatermark || item.video?.play;
                 const watermark = item.video?.watermark;
 
-                // Prioritize HD Stream Link first for Preview
                 const mainVideoSource = hdVideo || noWatermark;
 
                 if (mainVideoSource) {
@@ -255,7 +333,6 @@
                     placeholderEl.classList.add('hidden');
                 }
 
-                // HD Download Button
                 if (hdVideo) {
                     const b = document.createElement('button');
                     b.className = "bg-gradient-to-r from-blue-600 to-cyan-600 hover:opacity-90 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-lg shadow-cyan-950";
@@ -264,7 +341,6 @@
                     dlContainer.appendChild(b);
                 }
 
-                // Standard No-Watermark Download
                 if (noWatermark) {
                     const b = document.createElement('button');
                     b.className = "bg-cyan-700 hover:bg-cyan-600 text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2";
@@ -273,7 +349,6 @@
                     dlContainer.appendChild(b);
                 }
 
-                // Watermarked Download
                 if (watermark) {
                     const b = document.createElement('button');
                     b.className = "bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2";
@@ -282,7 +357,6 @@
                     dlContainer.appendChild(b);
                 }
 
-                // Photo Slideshow Posts
                 const images = item.images || [];
                 if (Array.isArray(images) && images.length > 0) {
                     imageEl.src = images[0];
@@ -299,7 +373,6 @@
                     });
                 }
 
-                // Audio Track
                 if (item.music?.url) {
                     const b = document.createElement('button');
                     b.className = "bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1";
@@ -317,16 +390,21 @@
         }
 
         async function fetchFeedData() {
-            const mode = document.getElementById('feed-mode').value;
-            const q = document.getElementById('feed-query').value.trim();
-            const cursor = document.getElementById('feed-cursor').value || 0;
+            const qInput = document.getElementById('feed-query').value.trim();
+            const cursorInput = document.getElementById('feed-cursor').value || 0;
+
+            if (currentMode !== 'trending' && !qInput) {
+                return alert('Please enter a Query Keyword for this mode');
+            }
 
             const btn = document.getElementById('feed-btn');
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Fetching...`;
 
             try {
-                const params = new URLSearchParams({ mode, q, cursor });
+                const params = new URLSearchParams({ mode: currentMode, cursor: cursorInput });
+                if (qInput) params.append('q', qInput);
+
                 const res = await fetch(`/api/feed?${params}`);
                 const data = await res.json();
 
@@ -338,20 +416,35 @@
                 const items = data.items || data.result || data.data || [];
 
                 if (!Array.isArray(items) || items.length === 0) {
-                    grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-8">No feed items found.</p>`;
+                    grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-8">No items found.</p>`;
                     return;
                 }
 
                 items.forEach(feedItem => {
-                    const author = feedItem.author?.name || feedItem.author || 'User';
+                    const author = feedItem.author?.name || feedItem.author?.unique_id || feedItem.author || 'User';
                     const desc = feedItem.title || feedItem.desc || 'No description';
                     const mediaLink = feedItem.video?.hd || feedItem.video?.noWatermark || feedItem.play || feedItem.url;
+                    const images = feedItem.images || [];
+
+                    let photosHTML = '';
+                    if (images.length > 0) {
+                        photosHTML = `<div class="flex flex-wrap gap-1 mt-2">`;
+                        images.slice(0, 4).forEach((img, idx) => {
+                            photosHTML += `
+                                <button onclick="triggerDirectDownload('${img}', 'photo_${idx+1}.jpg', this)" class="bg-pink-600 hover:bg-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-md">
+                                    Photo ${idx+1}
+                                </button>
+                            `;
+                        });
+                        photosHTML += `</div>`;
+                    }
 
                     grid.innerHTML += `
-                        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3">
+                        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3 shadow-lg">
                             <div>
                                 <span class="text-xs font-semibold text-pink-400">@${author}</span>
                                 <p class="text-xs text-slate-300 mt-1 line-clamp-3">${desc}</p>
+                                ${photosHTML}
                             </div>
                             ${mediaLink ? `
                                 <button onclick="triggerDirectDownload('${mediaLink}', 'tiktok_feed_hd_${Date.now()}.mp4', this)" class="w-full text-center bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium py-2 rounded-lg border border-slate-700 flex items-center justify-center gap-1">
@@ -366,7 +459,7 @@
                 alert(`Error: ${err.message}`);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> Fetch Feed Data`;
+                btn.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> Fetch Data`;
             }
         }
     </script>

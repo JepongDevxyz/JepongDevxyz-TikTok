@@ -1,60 +1,68 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-
 const app = express();
-const BASE_URL = 'https://tikxedd.vercel.app';
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
-// 1. Resolve TikTok URL Endpoint
+// TikTok Direct Resolver Endpoint
 app.get('/api/resolve', async (req, res) => {
     try {
-        const { url } = req.query;
-        if (!url) {
-            return res.status(400).json({ error: 'URL parameter is required' });
-        }
+        const videoUrl = req.query.url;
+        if (!videoUrl) return res.status(400).json({ ok: false, error: 'URL parameter is required' });
 
-        const endpoint = `${BASE_URL}/api/resolve?url=${encodeURIComponent(url)}`;
-        const response = await fetch(endpoint);
-
-        if (!response.ok) {
-            return res.status(response.status).json({ error: `Upstream error: ${response.statusText}` });
-        }
-
+        const apiUrl = `https://tikwm.com/api/?url=${encodeURIComponent(videoUrl)}`;
+        const response = await fetch(apiUrl);
         const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error', details: error.message });
+
+        if (data.code !== 0) {
+            return res.status(400).json({ ok: false, error: data.msg || 'Failed to fetch TikXedd media' });
+        }
+
+        res.json({ ok: true, item: data.data });
+    } catch (err) {
+        res.status(500).json({ ok: false, error: err.message });
     }
 });
 
-// 2. Feed Endpoint
+// TikXedd Multi-Mode Feed & Search Endpoint
 app.get('/api/feed', async (req, res) => {
     try {
-        const { mode = 'trending', q = '', cursor = '0' } = req.query;
-        const params = new URLSearchParams({ mode, q, cursor: String(cursor) });
-        const endpoint = `${BASE_URL}/api/feed?${params}`;
+        const { mode = 'trending', q = '', cursor = 0 } = req.query;
+        let apiUrl = '';
 
-        const response = await fetch(endpoint);
-
-        if (!response.ok) {
-            return res.status(response.status).json({ error: `Upstream error: ${response.statusText}` });
+        if (mode === 'trending') {
+            apiUrl = `https://tikwm.com/api/feed/list?region=US&count=12`;
+        } else if (mode === 'music') {
+            apiUrl = `https://tikwm.com/api/music/posts?url=${encodeURIComponent(q)}&cursor=${cursor}`;
+        } else {
+            // Standard search & photo search
+            apiUrl = `https://tikwm.com/api/feed/search?keywords=${encodeURIComponent(q)}&count=12&cursor=${cursor}`;
         }
 
+        const response = await fetch(apiUrl);
         const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error', details: error.message });
-    }
-});
 
-// Fallback to index.html
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
+        if (data.code !== 0 && !data.data) {
+            return res.status(400).json({ ok: false, error: data.msg || 'Upstream error fetching data' });
+        }
+
+        let items = data.data?.videos || data.data || [];
+
+        // Filter photo posts if mode is 'photo'
+        if (mode === 'photo') {
+            items = items.filter(i => (i.images && i.images.length > 0) || i.is_slideshow);
+        }
+
+        res.json({ ok: true, items });
+    } catch (err) {
+        res.status(500).json({ ok: false, error: err.message });
+    }
 });
 
 module.exports = app;
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+}
