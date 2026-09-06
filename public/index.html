@@ -27,13 +27,13 @@
     <!-- Main Container -->
     <main class="max-w-xl mx-auto px-4 py-8 flex-1 w-full space-y-6">
         
-        <!-- URL Downloader Card -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-            <label class="block text-sm font-medium text-slate-300">TikTok Video or Photo Link</label>
-            <div class="flex flex-col sm:flex-row gap-3">
+        <!-- URL Downloader Card (Centered Text and Inputs) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 text-center">
+            <label class="block text-sm font-medium text-slate-300 text-center">TikTok Video or Photo Link</label>
+            <div class="flex flex-col gap-3">
                 <input type="text" id="resolve-url" placeholder="https://vt.tiktok.com/xxxxxx/" 
-                    class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition">
-                <button onclick="handleResolve()" id="resolve-btn" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 font-semibold px-6 py-3 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                    class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-center focus:outline-none focus:border-cyan-500 transition">
+                <button onclick="handleResolve()" id="resolve-btn" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 font-semibold px-6 py-3 rounded-xl text-sm transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-download"></i> Get Media
                 </button>
             </div>
@@ -54,8 +54,8 @@
                 </div>
 
                 <!-- Profile & Downloads -->
-                <div class="w-full space-y-4 text-center sm:text-left">
-                    <div class="flex items-center justify-center sm:justify-start gap-3">
+                <div class="w-full space-y-4 text-center">
+                    <div class="flex items-center justify-center gap-3">
                         <img id="res-avatar" class="w-10 h-10 rounded-full border border-slate-700 hidden" alt="Avatar">
                         <div>
                             <span id="res-author" class="text-xs font-semibold text-cyan-400 bg-cyan-950/50 border border-cyan-800/50 px-2.5 py-1 rounded-md"></span>
@@ -67,7 +67,7 @@
 
                     <!-- Download Options -->
                     <div class="space-y-2 pt-2">
-                        <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Download Options</h4>
+                        <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider text-center">Download Options</h4>
                         <div class="flex flex-col gap-2" id="res-downloads"></div>
                     </div>
                 </div>
