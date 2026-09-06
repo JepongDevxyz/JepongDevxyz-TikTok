@@ -27,7 +27,7 @@ async function redisCommand(command, args = []) {
 // Endpoint to fetch current global total downloads
 app.get('/api/stats', async (req, res) => {
     let total = await redisCommand('GET', ['total_downloads']);
-    if (!total) total = 129488; // Default base starting count
+    if (!total) total = 0; // Default base starting count
     res.json({ ok: true, total: Number(total) });
 });
 
@@ -65,7 +65,7 @@ app.get('/api/resolve', async (req, res) => {
 
         // Increment Global Counter in Redis (+1 for every successful resolve)
         let newTotal = await redisCommand('INCR', ['total_downloads']);
-        if (!newTotal) newTotal = 129488;
+        if (!newTotal) newTotal = 0;
 
         res.json({ ok: true, item, globalDownloads: newTotal });
     } catch (err) {
