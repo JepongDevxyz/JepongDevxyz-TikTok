@@ -39,11 +39,11 @@
             </div>
         </div>
 
-        <!-- Result Section (v2.1.0 Exact Layout) -->
+        <!-- Result Section -->
         <div id="resolve-result" class="hidden space-y-5">
             
-            <!-- Video Preview Card -->
             <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-4 shadow-xl space-y-4">
+                <!-- Video / Photo Preview -->
                 <div class="w-full aspect-[9/16] bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 flex items-center justify-center relative">
                     <video id="res-video" controls class="w-full h-full object-cover hidden" preload="metadata"></video>
                     <img id="res-image" class="w-full h-full object-cover hidden" alt="Preview">
@@ -53,7 +53,7 @@
                     </div>
                 </div>
 
-                <!-- User Profile info -->
+                <!-- User Profile -->
                 <div class="flex items-center gap-3 pt-1">
                     <img id="res-avatar" class="w-10 h-10 rounded-full border border-slate-700 hidden" alt="Avatar">
                     <div class="flex flex-col">
@@ -62,7 +62,7 @@
                     </div>
                 </div>
 
-                <!-- Title / Description -->
+                <!-- Description -->
                 <p id="res-desc" class="text-slate-200 text-xs leading-relaxed"></p>
 
                 <!-- Stats Box -->
@@ -85,12 +85,6 @@
                 <div class="space-y-2 pt-1">
                     <h4 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Download Options</h4>
                     <div class="grid grid-cols-2 gap-2.5" id="res-downloads"></div>
-                </div>
-
-                <!-- Raw Data Output Box -->
-                <div class="space-y-2 pt-2 border-t border-slate-800/60">
-                    <h4 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Raw Data Output</h4>
-                    <pre id="raw-json-output" class="bg-slate-950 p-3 rounded-xl border border-slate-800/80 text-[10px] text-cyan-300/90 font-mono overflow-x-auto max-h-48 scrollbar-thin scrollbar-thumb-slate-800 leading-normal"></pre>
                 </div>
 
             </div>
@@ -150,7 +144,6 @@
                 document.getElementById('resolve-result').classList.remove('hidden');
                 const item = responseData.item || responseData;
 
-                // Set User profile
                 document.getElementById('res-author').textContent = item.author?.nickname || item.author?.name || 'TikTok User';
                 document.getElementById('res-handle').textContent = item.author?.unique_id ? `@${item.author.unique_id}` : '';
 
@@ -160,16 +153,11 @@
                     avatarImg.classList.remove('hidden');
                 }
 
-                // Description & Stats
                 document.getElementById('res-desc').textContent = item.title || item.desc || 'No caption available.';
                 document.getElementById('res-plays').textContent = item.play_count ? Number(item.play_count).toLocaleString() : '0';
                 document.getElementById('res-likes').textContent = item.digg_count ? Number(item.digg_count).toLocaleString() : '0';
                 document.getElementById('res-shares').textContent = item.share_count ? Number(item.share_count).toLocaleString() : '0';
 
-                // Display Raw JSON
-                document.getElementById('raw-json-output').textContent = JSON.stringify(item, null, 2);
-
-                // Media Previews
                 const videoEl = document.getElementById('res-video');
                 const imageEl = document.getElementById('res-image');
                 const placeholderEl = document.getElementById('res-media-placeholder');
@@ -181,7 +169,7 @@
                 placeholderEl.classList.remove('hidden');
 
                 const playUrl = item.play || item.video?.noWatermark;
-                const hdUrl = item.hdplay || item.video?.hd;
+                const hdUrl = item.hdplay || item.video?.hd || playUrl; // Fallback to playUrl if hd is null
                 const wmUrl = item.wmplay || item.video?.watermark;
                 const musicUrl = item.music_info?.play || item.music;
 
@@ -199,7 +187,7 @@
                     placeholderEl.classList.add('hidden');
                 }
 
-                // 1. No Watermark Button
+                // 1. No Watermark
                 if (playUrl) {
                     const b = document.createElement('button');
                     b.className = "bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition";
@@ -208,7 +196,7 @@
                     dlContainer.appendChild(b);
                 }
 
-                // 2. HD Quality Button
+                // 2. HD Quality (Always shown if video exists)
                 if (hdUrl) {
                     const b = document.createElement('button');
                     b.className = "bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition";
@@ -217,7 +205,7 @@
                     dlContainer.appendChild(b);
                 }
 
-                // 3. With Watermark Button
+                // 3. With Watermark
                 if (wmUrl) {
                     const b = document.createElement('button');
                     b.className = "bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition border border-slate-700";
@@ -226,7 +214,7 @@
                     dlContainer.appendChild(b);
                 }
 
-                // 4. Audio Track Button
+                // 4. Audio Track
                 if (musicUrl && typeof musicUrl === 'string') {
                     const b = document.createElement('button');
                     b.className = "bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition";
