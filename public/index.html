@@ -53,8 +53,6 @@
             <!-- Resolve Results Card -->
             <div id="resolve-result" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
                 <div class="flex flex-col md:flex-row gap-6 items-start">
-                    
-                    <!-- Media Preview -->
                     <div class="w-full md:w-5/12 aspect-[9/16] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center relative">
                         <video id="res-video" controls class="w-full h-full object-cover hidden"></video>
                         <img id="res-image" class="w-full h-full object-cover hidden" alt="Preview">
@@ -64,7 +62,6 @@
                         </div>
                     </div>
 
-                    <!-- Details & Download Buttons -->
                     <div class="flex-1 space-y-4 w-full">
                         <div class="flex items-center gap-3">
                             <img id="res-avatar" class="w-10 h-10 rounded-full border border-slate-700 hidden" alt="Avatar">
@@ -76,7 +73,6 @@
 
                         <p id="res-desc" class="text-slate-200 text-sm leading-relaxed"></p>
 
-                        <!-- Stats Row -->
                         <div class="grid grid-cols-3 gap-2 bg-slate-950 p-3 rounded-xl border border-slate-800/80 text-center text-xs">
                             <div>
                                 <span class="text-slate-500 block">Plays</span>
@@ -96,11 +92,6 @@
                             <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Download Options (High Quality)</h4>
                             <div class="flex flex-wrap gap-2" id="res-downloads"></div>
                         </div>
-
-                        <div class="pt-4 border-t border-slate-800">
-                            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Raw Data Output</h4>
-                            <pre id="raw-json" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] font-mono text-cyan-300 overflow-x-auto max-h-40"></pre>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -111,7 +102,7 @@
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     
-                    <!-- Modern Custom Floating Dropdown Menu -->
+                    <!-- Modern Custom Dropdown -->
                     <div class="relative">
                         <label class="block text-xs font-medium text-slate-400 mb-1">Mode</label>
                         <button type="button" id="custom-dropdown-btn" onclick="toggleCustomDropdown()" 
@@ -122,7 +113,6 @@
                             <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
                         </button>
 
-                        <!-- Floating Options Card -->
                         <div id="custom-dropdown-menu" class="hidden absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl z-50 overflow-hidden backdrop-blur-lg">
                             <div onclick="selectMode('trending', 'Trending Feed', 'fa-solid fa-fire text-pink-500')" 
                                 class="px-4 py-3 text-sm hover:bg-slate-800 cursor-pointer flex items-center gap-3 border-b border-slate-800/50">
@@ -164,18 +154,16 @@
                 </button>
             </div>
 
-            <!-- Feed Grid -->
-            <div id="feed-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <!-- Feed Grid with Media Previews -->
+            <div id="feed-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
     </main>
 
-    <!-- Footer -->
     <footer class="border-t border-slate-800 bg-slate-900/30 py-4 text-center text-xs text-slate-500">
         Engineered by <span class="text-slate-300 font-semibold">JepongDevxyz</span> &copy; 2026
     </footer>
 
-    <!-- Frontend Logic -->
     <script>
         let currentMode = 'trending';
 
@@ -198,10 +186,8 @@
             }
         }
 
-        // Custom Floating Dropdown Functions
         function toggleCustomDropdown() {
-            const menu = document.getElementById('custom-dropdown-menu');
-            menu.classList.toggle('hidden');
+            document.getElementById('custom-dropdown-menu').classList.toggle('hidden');
         }
 
         function selectMode(value, label, iconClass) {
@@ -222,51 +208,39 @@
                 queryContainer.classList.remove('opacity-50');
             } else {
                 queryInput.disabled = false;
-                queryInput.placeholder = "e.g. viral, dance, mobile legends";
+                queryInput.placeholder = "e.g. Mobile Legends, viral";
                 queryContainer.classList.remove('opacity-50');
             }
         }
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function(e) {
             const btn = document.getElementById('custom-dropdown-btn');
             const menu = document.getElementById('custom-dropdown-menu');
-            if (btn && menu && !btn.contains(event.target) && !menu.contains(event.target)) {
+            if (btn && menu && !btn.contains(e.target) && !menu.contains(e.target)) {
                 menu.classList.add('hidden');
             }
         });
 
-        // Direct File Downloader
         async function triggerDirectDownload(url, filename, btnElement) {
             const originalHTML = btnElement.innerHTML;
             btnElement.disabled = true;
-            btnElement.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Downloading HD...`;
+            btnElement.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Downloading...`;
 
             try {
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Network response not ok');
-                
                 const blob = await response.blob();
                 const blobUrl = window.URL.createObjectURL(blob);
                 
                 const tempAnchor = document.createElement('a');
-                tempAnchor.style.display = 'none';
                 tempAnchor.href = blobUrl;
                 tempAnchor.download = filename;
-                
                 document.body.appendChild(tempAnchor);
                 tempAnchor.click();
                 
                 window.URL.revokeObjectURL(blobUrl);
                 document.body.removeChild(tempAnchor);
             } catch (err) {
-                const tempAnchor = document.createElement('a');
-                tempAnchor.href = url;
-                tempAnchor.download = filename;
-                tempAnchor.target = '_self';
-                document.body.appendChild(tempAnchor);
-                tempAnchor.click();
-                document.body.removeChild(tempAnchor);
+                window.open(url, '_blank');
             } finally {
                 btnElement.disabled = false;
                 btnElement.innerHTML = originalHTML;
@@ -290,14 +264,10 @@
                 }
 
                 document.getElementById('resolve-result').classList.remove('hidden');
-                document.getElementById('raw-json').textContent = JSON.stringify(responseData, null, 2);
+                const item = responseData.item || responseData;
 
-                const item = responseData.item || responseData.result || responseData;
-
-                const authorName = item.author?.name || 'TikTok User';
-                const authorHandle = item.author?.handle ? `@${item.author.handle}` : '';
-                document.getElementById('res-author').textContent = authorName;
-                document.getElementById('res-handle').textContent = authorHandle;
+                document.getElementById('res-author').textContent = item.author?.name || 'TikTok User';
+                document.getElementById('res-handle').textContent = item.author?.unique_id ? `@${item.author.unique_id}` : '';
 
                 if (item.author?.avatar) {
                     const avatarImg = document.getElementById('res-avatar');
@@ -306,10 +276,9 @@
                 }
 
                 document.getElementById('res-desc').textContent = item.title || item.desc || 'No caption available.';
-
-                document.getElementById('res-plays').textContent = item.stats?.plays ? item.stats.plays.toLocaleString() : '-';
-                document.getElementById('res-likes').textContent = item.stats?.likes ? item.stats.likes.toLocaleString() : '-';
-                document.getElementById('res-shares').textContent = item.stats?.shares ? item.stats.shares.toLocaleString() : '-';
+                document.getElementById('res-plays').textContent = item.play_count ? Number(item.play_count).toLocaleString() : '-';
+                document.getElementById('res-likes').textContent = item.digg_count ? Number(item.digg_count).toLocaleString() : '-';
+                document.getElementById('res-shares').textContent = item.share_count ? Number(item.share_count).toLocaleString() : '-';
 
                 const videoEl = document.getElementById('res-video');
                 const imageEl = document.getElementById('res-image');
@@ -321,66 +290,34 @@
                 imageEl.classList.add('hidden');
                 placeholderEl.classList.remove('hidden');
 
-                const hdVideo = item.video?.hd;
-                const noWatermark = item.video?.noWatermark || item.video?.play;
-                const watermark = item.video?.watermark;
-
-                const mainVideoSource = hdVideo || noWatermark;
-
-                if (mainVideoSource) {
-                    videoEl.src = mainVideoSource;
+                const videoUrl = item.video?.hd || item.play;
+                if (videoUrl) {
+                    videoEl.src = videoUrl;
                     videoEl.classList.remove('hidden');
                     placeholderEl.classList.add('hidden');
-                }
 
-                if (hdVideo) {
                     const b = document.createElement('button');
-                    b.className = "bg-gradient-to-r from-blue-600 to-cyan-600 hover:opacity-90 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-lg shadow-cyan-950";
-                    b.innerHTML = `<i class="fa-solid fa-sparkles"></i> Download HD Video`;
-                    b.onclick = () => triggerDirectDownload(hdVideo, `tiktok_hd_${Date.now()}.mp4`, b);
-                    dlContainer.appendChild(b);
-                }
-
-                if (noWatermark) {
-                    const b = document.createElement('button');
-                    b.className = "bg-cyan-700 hover:bg-cyan-600 text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2";
-                    b.innerHTML = `<i class="fa-solid fa-download"></i> Download No Watermark`;
-                    b.onclick = () => triggerDirectDownload(noWatermark, `tiktok_nowatermark_${Date.now()}.mp4`, b);
-                    dlContainer.appendChild(b);
-                }
-
-                if (watermark) {
-                    const b = document.createElement('button');
-                    b.className = "bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2";
-                    b.innerHTML = `<i class="fa-solid fa-watermark"></i> With Watermark`;
-                    b.onclick = () => triggerDirectDownload(watermark, `tiktok_watermark_${Date.now()}.mp4`, b);
+                    b.className = "bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2";
+                    b.innerHTML = `<i class="fa-solid fa-download"></i> Download HD Video`;
+                    b.onclick = () => triggerDirectDownload(videoUrl, `tikxedd_video_${Date.now()}.mp4`, b);
                     dlContainer.appendChild(b);
                 }
 
                 const images = item.images || [];
-                if (Array.isArray(images) && images.length > 0) {
+                if (images.length > 0) {
                     imageEl.src = images[0];
                     imageEl.classList.remove('hidden');
                     videoEl.classList.add('hidden');
                     placeholderEl.classList.add('hidden');
 
-                    images.forEach((imgUrl, i) => {
+                    images.forEach((img, i) => {
                         const b = document.createElement('button');
                         b.className = "bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1";
                         b.innerHTML = `<i class="fa-solid fa-image"></i> Photo ${i + 1}`;
-                        b.onclick = () => triggerDirectDownload(imgUrl, `tiktok_photo_${i + 1}_${Date.now()}.jpg`, b);
+                        b.onclick = () => triggerDirectDownload(img, `tikxedd_photo_${i + 1}.jpg`, b);
                         dlContainer.appendChild(b);
                     });
                 }
-
-                if (item.music?.url) {
-                    const b = document.createElement('button');
-                    b.className = "bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1";
-                    b.innerHTML = `<i class="fa-solid fa-music"></i> Audio Track`;
-                    b.onclick = () => triggerDirectDownload(item.music.url, `tiktok_audio_${Date.now()}.mp3`, b);
-                    dlContainer.appendChild(b);
-                }
-
             } catch (err) {
                 alert(`Error: ${err.message}`);
             } finally {
@@ -394,12 +331,12 @@
             const cursorInput = document.getElementById('feed-cursor').value || 0;
 
             if (currentMode !== 'trending' && !qInput) {
-                return alert('Please enter a Query Keyword for this mode');
+                return alert('Please enter a Query Keyword');
             }
 
             const btn = document.getElementById('feed-btn');
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Fetching...`;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Fetching Data...`;
 
             try {
                 const params = new URLSearchParams({ mode: currentMode, cursor: cursorInput });
@@ -413,44 +350,69 @@
                 const grid = document.getElementById('feed-grid');
                 grid.innerHTML = '';
 
-                const items = data.items || data.result || data.data || [];
+                const items = data.items || [];
 
                 if (!Array.isArray(items) || items.length === 0) {
-                    grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-8">No items found.</p>`;
+                    grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-8">No results found.</p>`;
                     return;
                 }
 
-                items.forEach(feedItem => {
-                    const author = feedItem.author?.name || feedItem.author?.unique_id || feedItem.author || 'User';
-                    const desc = feedItem.title || feedItem.desc || 'No description';
-                    const mediaLink = feedItem.video?.hd || feedItem.video?.noWatermark || feedItem.play || feedItem.url;
-                    const images = feedItem.images || [];
+                items.forEach(item => {
+                    const author = item.author?.name || item.author?.unique_id || 'Creator';
+                    const desc = item.title || item.desc || 'No caption provided';
+                    const playUrl = item.video?.hd || item.play || item.video?.noWatermark;
+                    const coverImg = item.cover || item.origin_cover || (item.images && item.images[0]);
+                    const images = item.images || [];
 
-                    let photosHTML = '';
+                    let mediaPreviewHTML = '';
+                    if (playUrl) {
+                        mediaPreviewHTML = `
+                            <div class="aspect-[9/16] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 mb-3 relative">
+                                <video src="${playUrl}" controls poster="${coverImg || ''}" class="w-full h-full object-cover" preload="metadata"></video>
+                            </div>
+                        `;
+                    } else if (images.length > 0) {
+                        mediaPreviewHTML = `
+                            <div class="aspect-[9/16] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 mb-3 relative">
+                                <img src="${images[0]}" class="w-full h-full object-cover">
+                                <span class="absolute top-2 right-2 bg-slate-900/80 backdrop-blur text-[10px] px-2 py-1 rounded-md text-pink-400 border border-slate-700">
+                                    ${images.length} Photos
+                                </span>
+                            </div>
+                        `;
+                    }
+
+                    let actionButtons = '';
+                    if (playUrl) {
+                        actionButtons += `
+                            <button onclick="triggerDirectDownload('${playUrl}', 'tikxedd_${Date.now()}.mp4', this)" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-download"></i> Download Video
+                            </button>
+                        `;
+                    }
+
                     if (images.length > 0) {
-                        photosHTML = `<div class="flex flex-wrap gap-1 mt-2">`;
-                        images.slice(0, 4).forEach((img, idx) => {
-                            photosHTML += `
-                                <button onclick="triggerDirectDownload('${img}', 'photo_${idx+1}.jpg', this)" class="bg-pink-600 hover:bg-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-md">
-                                    Photo ${idx+1}
+                        actionButtons += `<div class="grid grid-cols-2 gap-2 mt-2">`;
+                        images.forEach((img, idx) => {
+                            actionButtons += `
+                                <button onclick="triggerDirectDownload('${img}', 'photo_${idx+1}.jpg', this)" class="bg-pink-600 hover:bg-pink-500 text-white text-[11px] font-bold py-2 rounded-lg flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-image"></i> Photo ${idx+1}
                                 </button>
                             `;
                         });
-                        photosHTML += `</div>`;
+                        actionButtons += `</div>`;
                     }
 
                     grid.innerHTML += `
-                        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3 shadow-lg">
+                        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col justify-between">
                             <div>
-                                <span class="text-xs font-semibold text-pink-400">@${author}</span>
-                                <p class="text-xs text-slate-300 mt-1 line-clamp-3">${desc}</p>
-                                ${photosHTML}
+                                ${mediaPreviewHTML}
+                                <span class="text-xs font-semibold text-cyan-400">@${author}</span>
+                                <p class="text-xs text-slate-300 mt-1 line-clamp-2">${desc}</p>
                             </div>
-                            ${mediaLink ? `
-                                <button onclick="triggerDirectDownload('${mediaLink}', 'tiktok_feed_hd_${Date.now()}.mp4', this)" class="w-full text-center bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium py-2 rounded-lg border border-slate-700 flex items-center justify-center gap-1">
-                                    <i class="fa-solid fa-download"></i> Direct HD Download
-                                </button>
-                            ` : ''}
+                            <div class="pt-3 border-t border-slate-800/80 mt-3">
+                                ${actionButtons}
+                            </div>
                         </div>
                     `;
                 });
