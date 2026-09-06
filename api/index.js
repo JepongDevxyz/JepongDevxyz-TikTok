@@ -13,7 +13,7 @@ app.get('/api/resolve', async (req, res) => {
         const videoUrl = req.query.url;
         if (!videoUrl) return res.status(400).json({ ok: false, error: 'URL parameter is required' });
 
-        // Request with hd=1 to force maximum quality from API
+        // Force maximum quality parameter (&hd=1)
         const response = await fetch(`https://tikwm.com/api/?url=${encodeURIComponent(videoUrl)}&hd=1`);
         const textData = await response.text();
 
@@ -30,12 +30,17 @@ app.get('/api/resolve', async (req, res) => {
 
         const item = data.data;
 
-        // Force maximum original resolution for HD link
         if (item) {
-            item.hdplay = item.hdplay || item.play;
-            if (item.hdplay && item.hdplay.startsWith('/')) {
-                item.hdplay = `https://tikwm.com${item.hdplay}`;
-            }
+            // Force No Watermark & HD to use the best available uncompressed source
+            const bestQualityStream = item.hdplay || item.play;
+            
+            item.play = bestQualityStream;
+            item.hdplay = bestQualityStream;
+
+            // Fix relative URLs if any
+            if (item.play && item.play.startsWith('/')) item.play = `https://tikwm.com${item.play}`;
+            if (item.hdplay && item.hdplay.startsWith('/')) item.hdplay = `https://tikwm.com${item.hdplay}`;
+            if (item.wmplay && item.wmplay.startsWith('/')) item.wmplay = `https://tikwm.com${item.wmplay}`;
         }
 
         res.json({ ok: true, item });
