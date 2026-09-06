@@ -13,7 +13,8 @@ app.get('/api/resolve', async (req, res) => {
         const videoUrl = req.query.url;
         if (!videoUrl) return res.status(400).json({ ok: false, error: 'URL parameter is required' });
 
-        const response = await fetch(`https://tikwm.com/api/?url=${encodeURIComponent(videoUrl)}`);
+        // Request with hd=1 to force maximum quality from API
+        const response = await fetch(`https://tikwm.com/api/?url=${encodeURIComponent(videoUrl)}&hd=1`);
         const textData = await response.text();
 
         let data;
@@ -27,7 +28,17 @@ app.get('/api/resolve', async (req, res) => {
             return res.status(400).json({ ok: false, error: data.msg || 'Failed to fetch TikTok media' });
         }
 
-        res.json({ ok: true, item: data.data });
+        const item = data.data;
+
+        // Force maximum original resolution for HD link
+        if (item) {
+            item.hdplay = item.hdplay || item.play;
+            if (item.hdplay && item.hdplay.startsWith('/')) {
+                item.hdplay = `https://tikwm.com${item.hdplay}`;
+            }
+        }
+
+        res.json({ ok: true, item });
     } catch (err) {
         res.status(500).json({ ok: false, error: err.message });
     }
