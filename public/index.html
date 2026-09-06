@@ -20,7 +20,7 @@
                     TikXedd Studio
                 </h1>
             </div>
-            <span class="text-xs font-mono bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">v2.1.0</span>
+            <span class="text-xs font-mono bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">v2.2.0</span>
         </div>
     </header>
 
@@ -163,6 +163,38 @@
             }
         }
 
+        // Automatic Direct Blob File Downloader
+        async function triggerDirectDownload(url, filename, btnElement) {
+            const originalHTML = btnElement.innerHTML;
+            btnElement.disabled = true;
+            btnElement.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Downloading...`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network error');
+                
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                const tempAnchor = document.createElement('a');
+                tempAnchor.style.display = 'none';
+                tempAnchor.href = blobUrl;
+                tempAnchor.download = filename;
+                
+                document.body.appendChild(tempAnchor);
+                tempAnchor.click();
+                
+                window.URL.revokeObjectURL(blobUrl);
+                document.body.removeChild(tempAnchor);
+            } catch (err) {
+                // Fallback to direct location if CORS blocks direct fetch
+                window.location.href = url;
+            } finally {
+                btnElement.disabled = false;
+                btnElement.innerHTML = originalHTML;
+            }
+        }
+
         async function handleResolve() {
             const urlInput = document.getElementById('resolve-url').value.trim();
             if (!urlInput) return alert('Please enter a valid TikTok URL');
@@ -225,15 +257,27 @@
                     videoEl.classList.remove('hidden');
                     placeholderEl.classList.add('hidden');
 
-                    dlContainer.innerHTML += `<a href="${noWatermark}" target="_blank" download class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2"><i class="fa-solid fa-download"></i> No Watermark</a>`;
+                    const b = document.createElement('button');
+                    b.className = "bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2";
+                    b.innerHTML = `<i class="fa-solid fa-download"></i> No Watermark`;
+                    b.onclick = () => triggerDirectDownload(noWatermark, `tiktok_nowatermark_${Date.now()}.mp4`, b);
+                    dlContainer.appendChild(b);
                 }
 
                 if (hdVideo) {
-                    dlContainer.innerHTML += `<a href="${hdVideo}" target="_blank" download class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2"><i class="fa-solid fa-film"></i> HD Quality</a>`;
+                    const b = document.createElement('button');
+                    b.className = "bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2";
+                    b.innerHTML = `<i class="fa-solid fa-film"></i> HD Quality`;
+                    b.onclick = () => triggerDirectDownload(hdVideo, `tiktok_hd_${Date.now()}.mp4`, b);
+                    dlContainer.appendChild(b);
                 }
 
                 if (watermark) {
-                    dlContainer.innerHTML += `<a href="${watermark}" target="_blank" download class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2"><i class="fa-solid fa-watermark"></i> With Watermark</a>`;
+                    const b = document.createElement('button');
+                    b.className = "bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2";
+                    b.innerHTML = `<i class="fa-solid fa-watermark"></i> With Watermark`;
+                    b.onclick = () => triggerDirectDownload(watermark, `tiktok_watermark_${Date.now()}.mp4`, b);
+                    dlContainer.appendChild(b);
                 }
 
                 // Images / Slide Posts
@@ -245,13 +289,21 @@
                     placeholderEl.classList.add('hidden');
 
                     images.forEach((imgUrl, i) => {
-                        dlContainer.innerHTML += `<a href="${imgUrl}" target="_blank" download class="bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1"><i class="fa-solid fa-image"></i> Photo ${i + 1}</a>`;
+                        const b = document.createElement('button');
+                        b.className = "bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1";
+                        b.innerHTML = `<i class="fa-solid fa-image"></i> Photo ${i + 1}`;
+                        b.onclick = () => triggerDirectDownload(imgUrl, `tiktok_photo_${i + 1}_${Date.now()}.jpg`, b);
+                        dlContainer.appendChild(b);
                     });
                 }
 
                 // Music Track
                 if (item.music?.url) {
-                    dlContainer.innerHTML += `<a href="${item.music.url}" target="_blank" download class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1"><i class="fa-solid fa-music"></i> Audio Track</a>`;
+                    const b = document.createElement('button');
+                    b.className = "bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1";
+                    b.innerHTML = `<i class="fa-solid fa-music"></i> Audio Track`;
+                    b.onclick = () => triggerDirectDownload(item.music.url, `tiktok_audio_${Date.now()}.mp3`, b);
+                    dlContainer.appendChild(b);
                 }
 
             } catch (err) {
@@ -300,9 +352,9 @@
                                 <p class="text-xs text-slate-300 mt-1 line-clamp-3">${desc}</p>
                             </div>
                             ${mediaLink ? `
-                                <a href="${mediaLink}" target="_blank" class="text-center bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium py-2 rounded-lg border border-slate-700 flex items-center justify-center gap-1">
-                                    <i class="fa-solid fa-download"></i> Open Media
-                                </a>
+                                <button onclick="triggerDirectDownload('${mediaLink}', 'tiktok_feed_${Date.now()}.mp4', this)" class="w-full text-center bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium py-2 rounded-lg border border-slate-700 flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-download"></i> Direct Download
+                                </button>
                             ` : ''}
                         </div>
                     `;
