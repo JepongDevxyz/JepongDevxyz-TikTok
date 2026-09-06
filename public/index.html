@@ -6,11 +6,23 @@
     <title>JepongDevxyz- UDLTIKVIDZ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes toastSlide {
+            0% { transform: translateY(-20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .animate-toast {
+            animation: toastSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans relative">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-4 pointer-events-none"></div>
 
     <!-- Header -->
-    <header class="border-b border-slate-800/60 bg-slate-900/40 backdrop-blur sticky top-0 z-50">
+    <header class="border-b border-slate-800/60 bg-slate-900/40 backdrop-blur sticky top-0 z-40">
         <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2.5">
                 <div class="bg-gradient-to-tr from-cyan-500 to-pink-500 p-2 rounded-xl text-white shadow-lg">
@@ -111,6 +123,38 @@
 
     <!-- Script -->
     <script>
+        // Modern Custom Toast Notification Function
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const isError = type === 'error';
+            const bgColor = isError ? 'bg-rose-950/90 border-rose-800/80 text-rose-200' : 'bg-emerald-950/90 border-emerald-800/80 text-emerald-200';
+            const icon = isError ? 'fa-circle-exclamation text-rose-400' : 'fa-circle-check text-emerald-400';
+
+            toast.className = `pointer-events-auto flex items-center justify-between gap-3 p-3.5 rounded-2xl border backdrop-blur-md shadow-2xl animate-toast ${bgColor}`;
+            toast.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid ${icon} text-base"></i>
+                    <span class="text-xs font-medium leading-snug">${message}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white text-xs px-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+
+            container.innerHTML = ''; // Keep only one toast at a time
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 3500);
+        }
+
         // Fetch Initial Global Downloads
         async function fetchGlobalStats() {
             try {
@@ -151,7 +195,7 @@
 
         async function handleResolve() {
             const urlInput = document.getElementById('resolve-url').value.trim();
-            if (!urlInput) return alert('Please enter a valid TikTok URL');
+            if (!urlInput) return showToast('Please enter a valid TikTok URL');
 
             const btn = document.getElementById('resolve-btn');
             btn.disabled = true;
@@ -248,7 +292,7 @@
                 }
 
             } catch (err) {
-                alert(`Error: ${err.message}`);
+                showToast(err.message || 'Something went wrong');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fa-solid fa-download"></i> Generate`;
