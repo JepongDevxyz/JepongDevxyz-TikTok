@@ -3,49 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikXedd Downloader</title>
+    <title>TikXedd Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
 
     <!-- Header -->
-    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="bg-gradient-to-tr from-cyan-500 to-pink-500 p-2 rounded-xl text-white">
-                    <i class="fa-brands fa-tiktok text-xl"></i>
+    <header class="border-b border-slate-800/60 bg-slate-900/40 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2.5">
+                <div class="bg-gradient-to-tr from-cyan-500 to-pink-500 p-2 rounded-xl text-white shadow-lg">
+                    <i class="fa-brands fa-tiktok text-lg"></i>
                 </div>
-                <h1 class="font-bold text-xl tracking-wide bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">
-                    TikXedd Downloader
+                <h1 class="font-bold text-lg tracking-wide bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">
+                    TikXedd Studio
                 </h1>
             </div>
-            <span class="text-xs font-mono bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">v3.0.0</span>
+            <span class="text-xs font-mono bg-slate-900 text-slate-400 px-2.5 py-1 rounded-md border border-slate-800">v2.1.0</span>
         </div>
     </header>
 
     <!-- Main Container -->
-    <main class="max-w-xl mx-auto px-4 py-8 flex-1 w-full space-y-6">
+    <main class="max-w-md mx-auto px-4 py-6 flex-1 w-full space-y-5">
         
-        <!-- URL Downloader Card (Centered Text and Inputs) -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 text-center">
-            <label class="block text-sm font-medium text-slate-300 text-center">TikTok Video or Photo Link</label>
+        <!-- Input Box -->
+        <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-4 text-center">
+            <label class="block text-sm font-medium text-slate-300">TikTok Video or Photo Link</label>
             <div class="flex flex-col gap-3">
                 <input type="text" id="resolve-url" placeholder="https://vt.tiktok.com/xxxxxx/" 
-                    class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-center focus:outline-none focus:border-cyan-500 transition">
-                <button onclick="handleResolve()" id="resolve-btn" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 font-semibold px-6 py-3 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                    class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-sm text-center focus:outline-none focus:border-cyan-500 transition">
+                <button onclick="handleResolve()" id="resolve-btn" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 font-semibold px-6 py-3 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-cyan-950/50">
                     <i class="fa-solid fa-download"></i> Get Media
                 </button>
             </div>
         </div>
 
-        <!-- Download Result Card -->
-        <div id="resolve-result" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
-            <div class="flex flex-col gap-6 items-center">
-                
-                <!-- Media Preview -->
-                <div class="w-full aspect-[9/16] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center relative max-w-xs">
-                    <video id="res-video" controls class="w-full h-full object-cover hidden"></video>
+        <!-- Result Section (v2.1.0 Exact Layout) -->
+        <div id="resolve-result" class="hidden space-y-5">
+            
+            <!-- Video Preview Card -->
+            <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-4 shadow-xl space-y-4">
+                <div class="w-full aspect-[9/16] bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 flex items-center justify-center relative">
+                    <video id="res-video" controls class="w-full h-full object-cover hidden" preload="metadata"></video>
                     <img id="res-image" class="w-full h-full object-cover hidden" alt="Preview">
                     <div id="res-media-placeholder" class="text-slate-600 text-center p-4">
                         <i class="fa-solid fa-photo-film text-4xl mb-2 block"></i>
@@ -53,35 +53,57 @@
                     </div>
                 </div>
 
-                <!-- Profile & Downloads -->
-                <div class="w-full space-y-4 text-center">
-                    <div class="flex items-center justify-center gap-3">
-                        <img id="res-avatar" class="w-10 h-10 rounded-full border border-slate-700 hidden" alt="Avatar">
-                        <div>
-                            <span id="res-author" class="text-xs font-semibold text-cyan-400 bg-cyan-950/50 border border-cyan-800/50 px-2.5 py-1 rounded-md"></span>
-                            <span id="res-handle" class="text-xs text-slate-400 block mt-1"></span>
-                        </div>
-                    </div>
-
-                    <p id="res-desc" class="text-slate-200 text-sm leading-relaxed"></p>
-
-                    <!-- Download Options -->
-                    <div class="space-y-2 pt-2">
-                        <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider text-center">Download Options</h4>
-                        <div class="flex flex-col gap-2" id="res-downloads"></div>
+                <!-- User Profile info -->
+                <div class="flex items-center gap-3 pt-1">
+                    <img id="res-avatar" class="w-10 h-10 rounded-full border border-slate-700 hidden" alt="Avatar">
+                    <div class="flex flex-col">
+                        <span id="res-author" class="text-xs font-bold text-cyan-400 px-2 py-0.5 rounded-md bg-cyan-950/60 border border-cyan-800/50 inline-block w-fit"></span>
+                        <span id="res-handle" class="text-xs text-slate-400 mt-0.5"></span>
                     </div>
                 </div>
+
+                <!-- Title / Description -->
+                <p id="res-desc" class="text-slate-200 text-xs leading-relaxed"></p>
+
+                <!-- Stats Box -->
+                <div class="grid grid-cols-3 gap-2 bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 text-center">
+                    <div>
+                        <span class="text-[11px] text-slate-500 block">Plays</span>
+                        <span id="res-plays" class="font-bold text-xs text-slate-200">-</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-500 block">Likes</span>
+                        <span id="res-likes" class="font-bold text-xs text-slate-200">-</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-500 block">Shares</span>
+                        <span id="res-shares" class="font-bold text-xs text-slate-200">-</span>
+                    </div>
+                </div>
+
+                <!-- Download Options Grid -->
+                <div class="space-y-2 pt-1">
+                    <h4 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Download Options</h4>
+                    <div class="grid grid-cols-2 gap-2.5" id="res-downloads"></div>
+                </div>
+
+                <!-- Raw Data Output Box -->
+                <div class="space-y-2 pt-2 border-t border-slate-800/60">
+                    <h4 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Raw Data Output</h4>
+                    <pre id="raw-json-output" class="bg-slate-950 p-3 rounded-xl border border-slate-800/80 text-[10px] text-cyan-300/90 font-mono overflow-x-auto max-h-48 scrollbar-thin scrollbar-thumb-slate-800 leading-normal"></pre>
+                </div>
+
             </div>
         </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-slate-800 bg-slate-900/30 py-4 text-center text-xs text-slate-500">
+    <footer class="border-t border-slate-800/60 bg-slate-900/20 py-4 text-center text-xs text-slate-500">
         Engineered by <span class="text-slate-300 font-semibold">JepongDevxyz</span> &copy; 2026
     </footer>
 
-    <!-- Logic -->
+    <!-- Script -->
     <script>
         async function triggerDirectDownload(url, filename, btnElement) {
             const originalHTML = btnElement.innerHTML;
@@ -115,19 +137,20 @@
 
             const btn = document.getElementById('resolve-btn');
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Processing...`;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Fetching...`;
 
             try {
                 const res = await fetch(`/api/resolve?url=${encodeURIComponent(urlInput)}`);
                 const responseData = await res.json();
 
                 if (!res.ok || responseData.ok === false) {
-                    throw new Error(responseData.error || 'Failed to download media.');
+                    throw new Error(responseData.error || 'Failed to fetch media.');
                 }
 
                 document.getElementById('resolve-result').classList.remove('hidden');
                 const item = responseData.item || responseData;
 
+                // Set User profile
                 document.getElementById('res-author').textContent = item.author?.nickname || item.author?.name || 'TikTok User';
                 document.getElementById('res-handle').textContent = item.author?.unique_id ? `@${item.author.unique_id}` : '';
 
@@ -137,8 +160,16 @@
                     avatarImg.classList.remove('hidden');
                 }
 
-                document.getElementById('res-desc').textContent = item.title || item.desc || 'No description';
+                // Description & Stats
+                document.getElementById('res-desc').textContent = item.title || item.desc || 'No caption available.';
+                document.getElementById('res-plays').textContent = item.play_count ? Number(item.play_count).toLocaleString() : '0';
+                document.getElementById('res-likes').textContent = item.digg_count ? Number(item.digg_count).toLocaleString() : '0';
+                document.getElementById('res-shares').textContent = item.share_count ? Number(item.share_count).toLocaleString() : '0';
 
+                // Display Raw JSON
+                document.getElementById('raw-json-output').textContent = JSON.stringify(item, null, 2);
+
+                // Media Previews
                 const videoEl = document.getElementById('res-video');
                 const imageEl = document.getElementById('res-image');
                 const placeholderEl = document.getElementById('res-media-placeholder');
@@ -149,17 +180,15 @@
                 imageEl.classList.add('hidden');
                 placeholderEl.classList.remove('hidden');
 
-                const hdVideo = item.video?.hd || item.play || item.wmplay;
-                if (hdVideo) {
-                    videoEl.src = hdVideo;
+                const playUrl = item.play || item.video?.noWatermark;
+                const hdUrl = item.hdplay || item.video?.hd;
+                const wmUrl = item.wmplay || item.video?.watermark;
+                const musicUrl = item.music_info?.play || item.music;
+
+                if (playUrl || hdUrl) {
+                    videoEl.src = hdUrl || playUrl;
                     videoEl.classList.remove('hidden');
                     placeholderEl.classList.add('hidden');
-
-                    const b = document.createElement('button');
-                    b.className = "w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 text-white text-xs font-bold py-3 rounded-xl flex items-center justify-center gap-2";
-                    b.innerHTML = `<i class="fa-solid fa-download"></i> Download No Watermark Video`;
-                    b.onclick = () => triggerDirectDownload(hdVideo, `tikxedd_video_${Date.now()}.mp4`, b);
-                    dlContainer.appendChild(b);
                 }
 
                 const images = item.images || [];
@@ -168,25 +197,42 @@
                     imageEl.classList.remove('hidden');
                     videoEl.classList.add('hidden');
                     placeholderEl.classList.add('hidden');
-
-                    images.forEach((img, i) => {
-                        const b = document.createElement('button');
-                        b.className = "w-full bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold py-2.5 rounded-xl flex items-center justify-center gap-2";
-                        b.innerHTML = `<i class="fa-solid fa-image"></i> Download Photo ${i + 1}`;
-                        b.onclick = () => triggerDirectDownload(img, `tikxedd_photo_${i + 1}.jpg`, b);
-                        dlContainer.appendChild(b);
-                    });
                 }
 
-                if (item.music) {
-                    const musicUrl = item.music_info?.play || item.music;
-                    if (typeof musicUrl === 'string') {
-                        const b = document.createElement('button');
-                        b.className = "w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-2.5 rounded-xl flex items-center justify-center gap-2";
-                        b.innerHTML = `<i class="fa-solid fa-music"></i> Download Audio Track (MP3)`;
-                        b.onclick = () => triggerDirectDownload(musicUrl, `tikxedd_audio_${Date.now()}.mp3`, b);
-                        dlContainer.appendChild(b);
-                    }
+                // 1. No Watermark Button
+                if (playUrl) {
+                    const b = document.createElement('button');
+                    b.className = "bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition";
+                    b.innerHTML = `<i class="fa-solid fa-download"></i> No Watermark`;
+                    b.onclick = () => triggerDirectDownload(playUrl, `tikxedd_nowatermark_${Date.now()}.mp4`, b);
+                    dlContainer.appendChild(b);
+                }
+
+                // 2. HD Quality Button
+                if (hdUrl) {
+                    const b = document.createElement('button');
+                    b.className = "bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition";
+                    b.innerHTML = `<i class="fa-solid fa-film"></i> HD Quality`;
+                    b.onclick = () => triggerDirectDownload(hdUrl, `tikxedd_hd_${Date.now()}.mp4`, b);
+                    dlContainer.appendChild(b);
+                }
+
+                // 3. With Watermark Button
+                if (wmUrl) {
+                    const b = document.createElement('button');
+                    b.className = "bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition border border-slate-700";
+                    b.innerHTML = `<i class="fa-solid fa-video"></i> With Watermark`;
+                    b.onclick = () => triggerDirectDownload(wmUrl, `tikxedd_watermark_${Date.now()}.mp4`, b);
+                    dlContainer.appendChild(b);
+                }
+
+                // 4. Audio Track Button
+                if (musicUrl && typeof musicUrl === 'string') {
+                    const b = document.createElement('button');
+                    b.className = "bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition";
+                    b.innerHTML = `<i class="fa-solid fa-music"></i> Audio Track`;
+                    b.onclick = () => triggerDirectDownload(musicUrl, `tikxedd_audio_${Date.now()}.mp3`, b);
+                    dlContainer.appendChild(b);
                 }
 
             } catch (err) {
